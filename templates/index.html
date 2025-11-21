@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+
+{% block title %}Ana Sayfa - Burak{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="min-h-screen flex items-center justify-center px-6">
+    <div class="text-center fade-in">
+        <h1 class="text-5xl md:text-7xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-purple-500">
+            Burak
+        </h1>
+        <p class="text-xl md:text-2xl text-gray-300 mb-4">Deep Learning Engineer</p>
+        <p class="text-lg md:text-xl text-gray-400 max-w-2xl mx-auto">
+            Yapay zeka ve derin öğrenme ile geleceği şekillendiriyorum
+        </p>
+        <div class="mt-10">
+            <a href="{{ url_for('projects') }}" class="inline-block px-8 py-3 bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors font-medium">
+                Projelerimi İncele
+            </a>
+        </div>
+    </div>
+</section>
+{% endblock %}
