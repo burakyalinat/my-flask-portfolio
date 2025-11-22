@@ -22,45 +22,44 @@ class Project(db.Model):
     def __repr__(self):
         return f'<Project {self.title}>'
 
-# Veritabanını oluştur ve seed data ekle
-def init_db():
-    with app.app_context():
-        # instance klasörünü oluştur
-        instance_path = os.path.join(basedir, 'instance')
-        if not os.path.exists(instance_path):
-            os.makedirs(instance_path)
+# Veritabanını oluştur ve seed data ekle - Uygulama başladığında otomatik çalışır
+with app.app_context():
+    # instance klasörünü oluştur
+    instance_path = os.path.join(basedir, 'instance')
+    if not os.path.exists(instance_path):
+        os.makedirs(instance_path)
+    
+    # Veritabanı tablolarını oluştur
+    db.create_all()
+    
+    # Eğer veritabanı boşsa seed data ekle
+    if Project.query.count() == 0:
+        projects = [
+            Project(
+                title="Brain Tumor Detection",
+                description="Derin öğrenme kullanarak beyin tümörü tespiti ve görüntü analizi projesi. CNN mimarisi ile yüksek doğruluk oranı elde edildi.",
+                github_link="https://github.com/burakyalinat/brain-tumor-detection",
+                image_url=""
+            ),
+            Project(
+                title="NLP Sentiment Analysis",
+                description="Doğal dil işleme teknikleri kullanarak metin duygu analizi yapan model. LSTM ve Transformer mimarileri ile geliştirildi.",
+                github_link="https://github.com/burakyalinat/nlp-sentiment-analysis",
+                image_url=""
+            ),
+            Project(
+                title="GAN Image Generation",
+                description="Generative Adversarial Networks kullanarak gerçekçi görüntü üretimi. StyleGAN ve DCGAN mimarileri ile çalışıldı.",
+                github_link="https://github.com/burakyalinat/gan-image-generation",
+                image_url=""
+            )
+        ]
         
-        # Veritabanı tablolarını oluştur
-        db.create_all()
+        for project in projects:
+            db.session.add(project)
         
-        # Eğer veritabanı boşsa seed data ekle
-        if Project.query.count() == 0:
-            projects = [
-                Project(
-                    title="Brain Tumor Detection",
-                    description="Derin öğrenme kullanarak beyin tümörü tespiti ve görüntü analizi projesi. CNN mimarisi ile yüksek doğruluk oranı elde edildi.",
-                    github_link="https://github.com/burakyalinat/brain-tumor-detection",
-                    image_url=""
-                ),
-                Project(
-                    title="NLP Sentiment Analysis",
-                    description="Doğal dil işleme teknikleri kullanarak metin duygu analizi yapan model. LSTM ve Transformer mimarileri ile geliştirildi.",
-                    github_link="https://github.com/burakyalinat/nlp-sentiment-analysis",
-                    image_url=""
-                ),
-                Project(
-                    title="GAN Image Generation",
-                    description="Generative Adversarial Networks kullanarak gerçekçi görüntü üretimi. StyleGAN ve DCGAN mimarileri ile çalışıldı.",
-                    github_link="https://github.com/burakyalinat/gan-image-generation",
-                    image_url=""
-                )
-            ]
-            
-            for project in projects:
-                db.session.add(project)
-            
-            db.session.commit()
-            print("Seed data başarıyla eklendi!")
+        db.session.commit()
+        print("Seed data başarıyla eklendi!")
 
 @app.route('/')
 def index():
@@ -80,6 +79,5 @@ def contact():
     return render_template('contact.html')
 
 if __name__ == '__main__':
-    init_db()
     app.run(debug=True)
 
