@@ -65,12 +65,12 @@ with app.app_context():
     # Varsayılan admin kullanıcısı oluştur (eğer yoksa)
     if User.query.count() == 0:
         admin_user = User(
-            username='admin',
-            password_hash=generate_password_hash('admin123')  # Üretimde değiştirin!
+            username='admingh645ghf',
+            password_hash=generate_password_hash('admin123ghfj')  # Üretimde değiştirin!
         )
         db.session.add(admin_user)
         db.session.commit()
-        print("Admin kullanıcısı oluşturuldu: admin / admin123")
+        print("Admin kullanıcısı oluşturuldu: admingh645ghf / admin123ghfj")
     
     # Eğer veritabanı boşsa seed data ekle
     if Project.query.count() == 0:
