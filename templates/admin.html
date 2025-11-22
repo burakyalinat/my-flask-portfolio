@@ -1,0 +1,164 @@
+{% extends "base.html" %}
+
+{% block title %}Admin Panel{% endblock %}
+
+{% block content %}
+<div class="min-h-screen py-20 px-6">
+    <div class="container mx-auto max-w-6xl">
+        <div class="flex justify-between items-center mb-8">
+            <h1 class="text-4xl font-bold">Admin Panel</h1>
+            <div class="flex space-x-4">
+                <a href="{{ url_for('index') }}" class="px-4 py-2 bg-gray-700 hover:bg-gray-600 rounded-lg transition-colors">
+                    Ana Sayfa
+                </a>
+                <a href="{{ url_for('logout') }}" class="px-4 py-2 bg-red-600 hover:bg-red-700 rounded-lg transition-colors">
+                    Çıkış Yap
+                </a>
+            </div>
+        </div>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="mb-4 p-3 rounded-lg {% if category == 'error' %}bg-red-900/50 text-red-200{% else %}bg-green-900/50 text-green-200{% endif %}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <!-- Yeni Proje Ekleme Formu -->
+        <div class="glass-effect rounded-2xl p-6 mb-8 fade-in">
+            <h2 class="text-2xl font-semibold mb-4 text-blue-400">Yeni Proje Ekle</h2>
+            <form method="POST" action="{{ url_for('add_project') }}" class="space-y-4">
+                <div>
+                    <label for="title" class="block text-sm font-medium text-gray-300 mb-2">Başlık *</label>
+                    <input 
+                        type="text" 
+                        id="title" 
+                        name="title" 
+                        required
+                        class="w-full bg-gray-800 text-white rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    >
+                </div>
+                
+                <div>
+                    <label for="description" class="block text-sm font-medium text-gray-300 mb-2">Açıklama *</label>
+                    <textarea 
+                        id="description" 
+                        name="description" 
+                        required
+                        rows="3"
+                        class="w-full bg-gray-800 text-white rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    ></textarea>
+                </div>
+                
+                <div>
+                    <label for="github_link" class="block text-sm font-medium text-gray-300 mb-2">GitHub Linki</label>
+                    <input 
+                        type="url" 
+                        id="github_link" 
+                        name="github_link"
+                        class="w-full bg-gray-800 text-white rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    >
+                </div>
+                
+                <div>
+                    <label for="image_url" class="block text-sm font-medium text-gray-300 mb-2">Resim URL</label>
+                    <input 
+                        type="url" 
+                        id="image_url" 
+                        name="image_url"
+                        class="w-full bg-gray-800 text-white rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    >
+                </div>
+                
+                <button 
+                    type="submit" 
+                    class="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg transition-colors"
+                >
+                    Proje Ekle
+                </button>
+            </form>
+        </div>
+
+        <!-- Mevcut Projeler -->
+        <div class="glass-effect rounded-2xl p-6 fade-in">
+            <h2 class="text-2xl font-semibold mb-4 text-blue-400">Mevcut Projeler</h2>
+            
+            {% if projects %}
+                <div class="space-y-4">
+                    {% for project in projects %}
+                    <div class="bg-gray-800 rounded-lg p-4">
+                        <form method="POST" action="{{ url_for('edit_project', project_id=project.id) }}" class="space-y-3">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-300 mb-1">Başlık</label>
+                                    <input 
+                                        type="text" 
+                                        name="title" 
+                                        value="{{ project.title }}"
+                                        required
+                                        class="w-full bg-gray-700 text-white rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    >
+                                </div>
+                                
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-300 mb-1">GitHub Linki</label>
+                                    <input 
+                                        type="url" 
+                                        name="github_link" 
+                                        value="{{ project.github_link or '' }}"
+                                        class="w-full bg-gray-700 text-white rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    >
+                                </div>
+                            </div>
+                            
+                            <div>
+                                <label class="block text-sm font-medium text-gray-300 mb-1">Açıklama</label>
+                                <textarea 
+                                    name="description" 
+                                    required
+                                    rows="2"
+                                    class="w-full bg-gray-700 text-white rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                >{{ project.description }}</textarea>
+                            </div>
+                            
+                            <div>
+                                <label class="block text-sm font-medium text-gray-300 mb-1">Resim URL</label>
+                                <input 
+                                    type="url" 
+                                    name="image_url" 
+                                    value="{{ project.image_url or '' }}"
+                                    class="w-full bg-gray-700 text-white rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                >
+                            </div>
+                            
+                            <div class="flex space-x-2">
+                                <button 
+                                    type="submit" 
+                                    class="flex-1 bg-green-600 hover:bg-green-700 text-white text-sm font-medium py-2 px-4 rounded transition-colors"
+                                >
+                                    Güncelle
+                                </button>
+                                <form method="POST" action="{{ url_for('delete_project', project_id=project.id) }}" class="flex-1" onsubmit="return confirm('Bu projeyi silmek istediğinizden emin misiniz?');">
+                                    <button 
+                                        type="submit" 
+                                        class="w-full bg-red-600 hover:bg-red-700 text-white text-sm font-medium py-2 px-4 rounded transition-colors"
+                                    >
+                                        Sil
+                                    </button>
+                                </form>
+                            </div>
+                        </form>
+                    </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <p class="text-gray-400 text-center py-8">Henüz proje eklenmemiş.</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
