@@ -1,6 +1,10 @@
-from flask import Flask, render_template
+from dotenv import load_dotenv
+load_dotenv()
+
+from flask import Flask, render_template, request, jsonify
 from flask_sqlalchemy import SQLAlchemy
 import os
+import google.generativeai as genai
 
 app = Flask(__name__)
 
@@ -77,6 +81,49 @@ def projects():
 @app.route('/contact')
 def contact():
     return render_template('contact.html')
+
+@app.route('/api/chat', methods=['POST'])
+def chat():
+    try:
+        data = request.get_json()
+        user_message = data.get('message', '')
+        
+        if not user_message:
+            return jsonify({'error': 'Mesaj boş olamaz'}), 400
+        
+        # Gemini API anahtarını ortam değişkeninden al
+        api_key = os.environ.get('GEMINI_API_KEY')
+        if not api_key:
+            return jsonify({'error': 'GEMINI_API_KEY ortam değişkeni ayarlanmamış'}), 500
+        
+        # Gemini API'yi yapılandır
+        genai.configure(api_key=api_key)
+        
+        # Generation config - daha tutarlı ve hızlı cevaplar için
+        generation_config = {
+            'temperature': 0.7,  # Düşük değer daha tutarlı cevaplar verir (0.0-1.0)
+            'top_p': 0.95,        # Nucleus sampling
+            'top_k': 40,          # Top-k sampling
+            'max_output_tokens': 1024,  # Maksimum token sayısı
+        }
+        
+        # Gemini 1.5 Flash modelini kullan (güncel ve hızlı)
+        model = genai.GenerativeModel(
+            'gemini-2.5-flash',
+            generation_config=generation_config
+        )
+        
+        # Sistem mesajı ile birlikte kullanıcı mesajını gönder
+        system_prompt = "Sen Burak'ın asistanısın. Burak bir Deep Learning mühendisi. Zeki, kısa ve hafif esprili cevaplar ver."
+        full_prompt = f"{system_prompt}\n\nKullanıcı: {user_message}\nAsistan:"
+        
+        response = model.generate_content(full_prompt)
+        
+        return jsonify({'response': response.text})
+    
+    except Exception as e:
+        print(f"Chat error: {str(e)}")
+        return jsonify({'error': 'Bir hata oluştu'}), 500
 
 if __name__ == '__main__':
     app.run(debug=True)
